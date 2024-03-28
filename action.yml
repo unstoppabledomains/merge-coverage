@@ -61,16 +61,29 @@ runs:
       with:
         script: |
           const {readdir, writeFile, copyFile, mkdir} = require('fs').promises;
+          console.log("making directory ${{ github.workspace }}/coverage")
           await mkdir(`${{ github.workspace }}/coverage`);
+          console.log ("readdir")
           const reports = await readdir('${{ inputs.coverage-reports }}', { withFileTypes: true });
+          console.log ("==========start of reports==========")
+          console.log (reports)
+          console.log ("==========end of reports==========")
           
+          console.log ("filtering reportDirs")
           const reportDirs = reports.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);       
+          console.log ("==========start of reportDirs==========")
+          console.log (reportDirs)
+          console.log ("==========end of reportDirs==========")
           for (const dir of reportDirs) {
+          console.log (`working on ${dir}`)
             await copyFile(`${{ inputs.coverage-reports }}/${dir}/coverage-final.json`, `${{ github.workspace }}/coverage/${dir}.json`)
           }; 
-          
           const reportFiles = reports.filter(dirent => dirent.isFile() && dirent.name.includes('.json')).map(dirent => dirent.name);
+          console.log ("==========start of reportFiles==========")
+          console.log (reportFiles)
+          console.log ("==========end of reportFiles==========")
           for (const file of reportFiles) {
+            console.log (`copying ${{ inputs.coverage-reports }}/${file} ${{ github.workspace }}/coverage/${file}.json`)
             await copyFile(`${{ inputs.coverage-reports }}/${file}`, `${{ github.workspace }}/coverage/${file}.json`)
           }; 
 
